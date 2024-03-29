@@ -84,10 +84,10 @@ a, b, c = 1, 1, 1
 x, y = 0, 10
 
 # numar cromozomi:
-nr_crom = 25
+nr_crom = 20
 
 # numar de generatii:
-nr_gen = 10
+nr_gen = 5
 
 # probabilitate recombinare
 p_recomb = 0.3
@@ -103,12 +103,36 @@ l = math.ceil(math.log((y-x) * 10**p, 2))
 
 # cromozomi codificati
 lista_cromozomi = []
-for i in range(5):
+for i in range(nr_crom):
     lista_cromozomi.append(codificare(x, y, l, genereaza_cromozom(l)))
 
 for _ in range(nr_gen):
     generatie = selectie(a, b, c, lista_cromozomi)
+    print(len(generatie))
 
+    elem_elitist = generatie[len(generatie) - 1]
+
+    list_recomb = []
+    list_mut = []
+
+    #incrucisare
     for c in range(nr_crom):
-        if p_recomb > random.random()
+        if p_recomb > random.random():
+            list_recomb += generatie[c]
 
+    #for c1, c2 in list_recomb:
+    vals = [x for x in range(2, l-1)]
+    for i in range(0, len(list_recomb)-1, 2):
+        v1, v2 = incrucisare(decodificare(x, y, l, list_recomb[i]), decodificare(x, y, l, list_recomb[i+1]), random.choice(vals))
+        generatie[list_recomb[i][1]] = v1
+        generatie[list_recomb[i+1][1]] = v2
+
+    #mutatie
+    for i in range(nr_crom):
+        if p_mut > random.random():
+            generatie[i] = mutatie(decodificare(x,y,l,generatie[i]), [i])
+
+    generatie[len(generatie) - 1] = elem_elitist
+    lista_cromozomi = generatie
+
+print(lista_cromozomi[len(lista_cromozomi) - 1])
