@@ -101,7 +101,14 @@ l = math.ceil(math.log((y-x) * 10**p, 2))
 #-------------------------------------------------
 # ALGORITMUL
 
+# cromozomi codificati
 lista_cromozomi = []
 for i in range(5):
-    lista_cromozomi.append(genereaza_cromozom(8))
+    lista_cromozomi.append(codificare(x, y, l, genereaza_cromozom(l)))
+
+for _ in range(nr_gen):
+    generatie = selectie(a, b, c, lista_cromozomi)
+
+    for c in range(nr_crom):
+        if p_recomb > random.random()
 
