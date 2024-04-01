@@ -166,9 +166,11 @@ for _ in range(nr_gen):
         if p_mut > random.random():
             m_selectie[i] = codificare(x, y, l, mutatie(decodificare(x, y, l, m_selectie[i]), [random.choice(vals)]))
 
-    m_selectie[len(m_selectie) - 1] = elem_elitist
+    #m_selectie[len(m_selectie) - 1] = elem_elitist
     #print(m_selectie)
-    lista_cromozomi += m_selectie
+    lista_cromozomi = m_selectie
+    lista_cromozomi.append(elem_elitist)
+    #print(len(lista_cromozomi))
 
 print(elem_elitist)
 print(a * elem_elitist * elem_elitist + b * elem_elitist + c)
