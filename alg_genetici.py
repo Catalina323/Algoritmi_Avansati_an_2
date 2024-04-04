@@ -93,7 +93,7 @@ nr_gen = 50
 p_recomb = 0.25
 
 # probabilitate mutatie
-p_mut = 0.01
+p_mut = 0.1
 
 # lungime cromozomi:
 l = math.ceil(math.log((y-x) * 10**p, 2))
@@ -106,17 +106,31 @@ lista_cromozomi = []
 for i in range(nr_crom):
     lista_cromozomi.append(codificare(x, y, l, genereaza_cromozom(l)))
 
-print(lista_cromozomi)
+#out = open("output.txt", "w")
 
+nr = 1
+print("Populatia initiala:")
+for crom in lista_cromozomi:
+    print(nr, ":", decodificare(x, y, l, crom), "x =", crom, " f =", a*crom*crom+b*crom+c)
+    nr += 1
+
+afisare = True
 for _ in range(nr_gen):
-    #print(lista_cromozomi)
+
     intervale_selectie = selectie(a, b, c, lista_cromozomi)
 
+    if afisare:
+        print("Probabilitati selectie:")
+        for i in range(1, nr_crom + 1):
+            print("cromozom", i, "cu probabilitate:", intervale_selectie[i]-intervale_selectie[i-1])
+
+        print("Interval probabilitati selectie:")
+        print(intervale_selectie)
 
     #selectie:
 
     generatie = []
-    for i in range(nr_crom - 1):
+    for i in range(nr_crom):
         r = random.random()
 
         # tentativa cautare binara...
@@ -140,6 +154,8 @@ for _ in range(nr_gen):
         for j in range(nr_crom + 1):
             if intervale_selectie[j] > r:
                 generatie.append(lista_cromozomi[j - 1])
+                if afisare:
+                    print("u =", r, "selectam cromozomul", j)
                 break
 
 
@@ -148,32 +164,89 @@ for _ in range(nr_gen):
         if elem_elitist*a*elem_elitist + b*elem_elitist + c < a*elem*elem + b*elem + c:
             elem_elitist = elem
 
-    #print(m_selectie)
+
+    if afisare:
+        print("Dupa selectie:")
+        nr = 1
+        for crom in generatie:
+            print(nr, ":", decodificare(x, y, l, crom), "x =", crom, " f =", a * crom * crom + b * crom + c)
+            nr += 1
+
 
     crom1 = "*"
     poz1 = "*"
     vals = [x for x in range(2, l - 1)]
+
+    if afisare:
+        print()
+        print("probabilitatea de incrucisare:", p_recomb)
+
     #incrucisare
-    for cc in range(len(generatie) - 1):
-        if p_recomb > random.random():
+    for cc in range(len(generatie)):
+        r = random.random()
+        if p_recomb > r:
             if crom1 == "*":
                 crom1 = generatie[cc]
                 poz1 = cc
+                if afisare:
+                    print(cc+1, ":", decodificare(x, y, l, generatie[cc]), "u =", r, "<", p_recomb, "participa")
             else:
-                v1, v2 = incrucisare(decodificare(x, y, l, crom1), decodificare(x, y, l, generatie[cc]), random.choice(vals))
+                if afisare:
+                    print(cc+1, ":", decodificare(x, y, l, generatie[cc]), "u =", r, "<", p_recomb, "participa")
+
+                pozitie = random.choice(vals)
+                v1, v2 = incrucisare(decodificare(x, y, l, crom1), decodificare(x, y, l, generatie[cc]), pozitie)
+
+                if afisare:
+                    print("incrucisare pe pozitia", pozitie, "rezultat:", v1, v1)
+
                 generatie[poz1] = codificare(x, y, l, v1)
                 generatie[cc] = codificare(x, y, l, v2)
                 crom1 = "*"
+        else:
+            if afisare:
+                print(cc + 1, ":", decodificare(x, y, l, generatie[cc]), "u =", r, ">", p_recomb, " NU participa")
+
+    if afisare:
+        print()
+        print("dupa incrucisare")
+        nr = 1
+        for crom in generatie:
+            print(nr, ":", decodificare(x, y, l, crom), "x =", crom, " f =", a * crom * crom + b * crom + c)
+            nr += 1
+        print()
+        print("probabilitate mutatie =", p_mut)
+
 
     #mutatie
-    for i in range(len(generatie) - 1):
-        if p_mut > random.random():
-            generatie[i] = codificare(x, y, l, mutatie(decodificare(x, y, l, generatie[i]), [random.choice(vals)]))
+    for i in range(len(generatie)):
+        r = random.random()
+        if p_mut > r:
+            pozitie2 = random.choice(vals)
+            aux = mutatie(decodificare(x, y, l, generatie[i]), [pozitie2])
+            if afisare:
+                print("cromozomul", i+1, ": u =", r, "<", p_mut, "mutatia pe geana", pozitie2, decodificare(x, y, l, generatie[i]), "devine", aux)
+            generatie[i] = codificare(x, y, l, aux)
 
+    if afisare:
+        print()
+        print("dupa mutatie")
+        nr = 1
+        for crom in generatie:
+            print(nr, ":", decodificare(x, y, l, crom), "x =", crom, " f =", a * crom * crom + b * crom + c)
+            nr += 1
+        print()
 
     lista_cromozomi = generatie
     lista_cromozomi.append(elem_elitist)
 
+    if afisare:
+        print("Evolutia maximului")
 
-print(elem_elitist)
+    print(elem_elitist)
+
+    afisare = False
+
+
+print()
 print(a * elem_elitist * elem_elitist + b * elem_elitist + c)
