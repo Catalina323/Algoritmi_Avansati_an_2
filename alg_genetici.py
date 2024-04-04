@@ -78,22 +78,22 @@ def genereaza_cromozom(l):
 p = 2
 
 # functia:
-a, b, c = -1, 2, 3
+a, b, c = -2, -12, 5
 
 # intervalul:
-x, y = 0, 2
+x, y = -5, 0
 
 # numar cromozomi:
-nr_crom = 30
+nr_crom = 20
 
 # numar de generatii:
-nr_gen = 100
+nr_gen = 50
 
 # probabilitate recombinare
-p_recomb = 0.6
+p_recomb = 0.25
 
 # probabilitate mutatie
-p_mut = 0.3
+p_mut = 0.01
 
 # lungime cromozomi:
 l = math.ceil(math.log((y-x) * 10**p, 2))
@@ -118,59 +118,62 @@ for _ in range(nr_gen):
     generatie = []
     for i in range(nr_crom - 1):
         r = random.random()
+
+        # tentativa cautare binara...
+        # st = 0
+        # dr = nr_crom - 1
+        # while st < dr:
+        #     mij = (st + dr) // 2
+        #
+        #     if intervale_selectie[mij] > r:
+        #
+        #         if intervale_selectie[mij - 1] <= r:
+        #             generatie.append(lista_cromozomi[mij - 1])
+        #             #print(lista_cromozomi[mij - 1])
+        #             break
+        #         else:
+        #             dr = mij - 1
+        #     else:
+        #         st = mij + 1
+
+
         for j in range(nr_crom + 1):
             if intervale_selectie[j] > r:
                 generatie.append(lista_cromozomi[j - 1])
                 break
 
 
-    r = random.random()
-    for j in range(nr_crom + 1):
-        if intervale_selectie[j] > r:
-            elem_elitist = lista_cromozomi[j - 1]
-            break
-
-    m_selectie = generatie
+    elem_elitist = lista_cromozomi[0]
+    for elem in lista_cromozomi:
+        if elem_elitist*a*elem_elitist + b*elem_elitist + c < a*elem*elem + b*elem + c:
+            elem_elitist = elem
 
     #print(m_selectie)
-
-
-    for elem in lista_cromozomi:
-        for elem2 in list(set(m_selectie)):
-            if elem2 == elem:
-                #if lista_cromozomi[i] in generatie:
-                lista_cromozomi.pop(lista_cromozomi.index(elem))
-
-
-
-    list_recomb = []
-    list_mut = []
 
     crom1 = "*"
     poz1 = "*"
     vals = [x for x in range(2, l - 1)]
     #incrucisare
-    for cc in range(len(m_selectie) - 1):
+    for cc in range(len(generatie) - 1):
         if p_recomb > random.random():
             if crom1 == "*":
-                crom1 = m_selectie[cc]
+                crom1 = generatie[cc]
                 poz1 = cc
             else:
-                v1, v2 = incrucisare(decodificare(x, y, l, crom1), decodificare(x, y, l, m_selectie[cc]), random.choice(vals))
-                m_selectie[poz1] = codificare(x, y, l, v1)
-                m_selectie[cc] = codificare(x, y, l, v2)
+                v1, v2 = incrucisare(decodificare(x, y, l, crom1), decodificare(x, y, l, generatie[cc]), random.choice(vals))
+                generatie[poz1] = codificare(x, y, l, v1)
+                generatie[cc] = codificare(x, y, l, v2)
                 crom1 = "*"
 
     #mutatie
-    for i in range(len(m_selectie) - 1):
+    for i in range(len(generatie) - 1):
         if p_mut > random.random():
-            m_selectie[i] = codificare(x, y, l, mutatie(decodificare(x, y, l, m_selectie[i]), [random.choice(vals)]))
+            generatie[i] = codificare(x, y, l, mutatie(decodificare(x, y, l, generatie[i]), [random.choice(vals)]))
 
-    #m_selectie[len(m_selectie) - 1] = elem_elitist
-    #print(m_selectie)
-    lista_cromozomi = m_selectie
+
+    lista_cromozomi = generatie
     lista_cromozomi.append(elem_elitist)
-    #print(len(lista_cromozomi))
+
 
 print(elem_elitist)
 print(a * elem_elitist * elem_elitist + b * elem_elitist + c)
